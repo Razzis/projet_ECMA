@@ -1,0 +1,111 @@
+\documentclass[a4paper,11pt] {article}
+
+\setlength{\hoffset}{-18pt}         
+\setlength{\oddsidemargin}{9pt} % Marge gauche sur pages impaires
+\setlength{\evensidemargin}{9pt} % Marge gauche sur pages paires
+\setlength{\marginparwidth}{54pt} % Largeur de note dans la marge
+\setlength{\textwidth}{481pt} % Largeur de la zone de texte (17cm)
+\setlength{\voffset}{-18pt} % Bon pour DOS
+\setlength{\marginparsep}{7pt} % Séparation de la marge
+\setlength{\topmargin}{0pt} % Pas de marge en haut
+\setlength{\headheight}{13pt} % Haut de page
+\setlength{\headsep}{10pt} % Entre le haut de page et le texte
+\setlength{\footskip}{27pt} % Bas de page + séparation
+\setlength{\textheight}{708pt} % Hauteur de la zone de texte (25cm)
+
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} % load a font with all the characters
+\usepackage{mathtools}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{listings}
+\usepackage{amsthm}
+\author{HASSAN Lucas, JACQUOT Paulin}
+\date{décembre 2015}
+\usepackage{amsfonts}
+\usepackage{stmaryrd}
+
+\begin{document}
+
+
+\title{Introduction à l'API C++ de Cplex}
+
+\maketitle{}
+\section{Exerci 1}
+\subsection{Modélisation naïve du problème}
+
+Le problème se modélise naturellement de la façon suivant : 
+
+\begin{equation}
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_i{ij}\\
+H^p(M)+H^a(M) \geq 2
+\end{array}
+\end{equation}
+
+Où $H^p(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}}$ et $H^a(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^a_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}}$
+
+On remarque que la contrainte définie est fractionnaire. Ainsi on choisit la linéariser de la manière suivante : 
+
+Cette contrainte s'écrit aussi : 
+
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}) + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}) \geq 2(\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl})(\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl})\\
+\end{array}
+\end{equation}
+
+Définissons les variables réelles $p$ et $a$ telle que  : 
+\begin{equation}
+\begin{array}{l}
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\end{equation}
+
+Les contraintes s'écrivent alors : 
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}px_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}ax_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}px_{ij})\\
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\end{equation}
+
+On définit ensuite $\forall\quad (i,j)\in M a_{ij}=ax_{ij}$ et $p_{ij}=px_{ij}$
+
+On sait que l'égualité $a_{ij}=ax_{ij}$ s'écris encore : 
+\begin{equation}
+\begin{array}{l}
+a_{ij}\leq a_{max}x_{ij}\\
+a_{ij}\leq a\\
+a_{ij}\geq (x_{ij}-1)a_{max}+a\\
+a_{ij} \geq 0
+\end{array}
+\end{equation}
+
+où $a_{max}$ est une borne supérieur de $a$. Une borne supérieur triviale de $a$ est ici $\sum\limits_{(i,j)\in M} C^a_{ij}$.
+
+Ainsi, on définit le problème linéarisé : 
+
+\begin{equation}
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_{ij}\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}p_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}a_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+a_{ij}\leq a_{max}x_{ij}\\
+a_{ij}\leq a\\
+a_{ij}\geq (x_{ij}-1)a_{max}+a\\
+a_{ij} \geq 0\\
+p_{ij}\leq p_{max}x_{ij}\\
+p_{ij}\leq p\\
+p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+p_{ij} \geq 0\\
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\end{equation}
+\end{document}
