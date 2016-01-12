@@ -1,0 +1,164 @@
+\documentclass[a4paper,11pt] {article}
+
+\setlength{\hoffset}{-18pt}         
+\setlength{\oddsidemargin}{9pt} % Marge gauche sur pages impaires
+\setlength{\evensidemargin}{9pt} % Marge gauche sur pages paires
+\setlength{\marginparwidth}{54pt} % Largeur de note dans la marge
+\setlength{\textwidth}{481pt} % Largeur de la zone de texte (17cm)
+\setlength{\voffset}{-18pt} % Bon pour DOS
+\setlength{\marginparsep}{7pt} % Séparation de la marge
+\setlength{\topmargin}{0pt} % Pas de marge en haut
+\setlength{\headheight}{13pt} % Haut de page
+\setlength{\headsep}{10pt} % Entre le haut de page et le texte
+\setlength{\footskip}{27pt} % Bas de page + séparation
+\setlength{\textheight}{708pt} % Hauteur de la zone de texte (25cm)
+
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} % load a font with all the characters
+\usepackage{mathtools}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{listings}
+\usepackage{amsthm}
+\author{HASSAN Lucas, NGUYEN Tito}
+\date{décembre 2015}
+\usepackage{amsfonts}
+\usepackage{stmaryrd}
+
+\begin{document}
+
+
+\title{Rapport d'étape du projet ECMA}
+
+\maketitle{}
+\section{Modélisation du problème sous la forme d'un PL}
+\subsection{Modélisation naïve du problème}
+Dans un premier temps, on ne s'intéresse pas à la contrainte de connexité du problème.
+
+
+Le problème se modélise alors naturellement de la façon suivante : 
+
+\begin{equation}
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_i{ij}\\
+H^p(M)+H^a(M) \geq 2
+\end{array}
+\end{equation}
+
+Où $H^p(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}}$ et $H^a(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^a_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}}$
+
+\subsection{Linéarisation de la modélisation}
+
+On remarque que la contrainte définie est fractionnaire. Ainsi on choisit la linéariser de la manière suivante : 
+
+La contrainte s'écrit aussi : 
+
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}) + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}) \geq 2(\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl})(\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl})\\
+\end{array}
+\end{equation}
+
+Définissons les variables réelles $p$ et $a$ telle que  : 
+\begin{equation}
+\begin{array}{l}
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\end{equation}
+
+Les contraintes du problème d'optimisation s'écrivent alors : 
+\begin{equation}
+\left\{
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}px_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}ax_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}px_{ij})\\
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\right.
+\end{equation}
+
+On définit ensuite $\forall (i,j)\in M\quad a_{ij}=ax_{ij}$ et $p_{ij}=px_{ij}$
+
+
+
+On sait que l’égalité $a_{ij}=ax_{ij}$ s’écrit encore : 
+\begin{equation}
+\begin{array}{l}
+a_{ij}\leq a_{max}x_{ij}\\
+a_{ij}\leq a\\
+a_{ij}\geq (x_{ij}-1)a_{max}+a\\
+a_{ij} \geq 0
+\end{array}
+\end{equation}
+
+où $a_{max}$ est une borne supérieur de $a$. Une borne supérieur triviale de $a$ est ici $\sum\limits_{(i,j)\in M} C^a_{ij}$. Il en est de même pour la contrainte $p_{ij}=px_{ij}$.
+
+Ainsi, on définit le problème linéarisé : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_{ij}\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}p_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}a_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+	\begin{array}{lll}
+		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
+		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
+		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})
+	\end{array}
+\end{array}
+\right.
+\end{equation}
+
+\subsection{Prise en compte de la contrainte de connexité}
+
+Une commune peut être représentée par un graphe non orienté tel que chaque chaque maille $(i,j)$ est un nœud du graphe, les nœuds étant reliés par des arrêtes si les mailles correspondante sont adjacentes dans $Z=\{(i,j)\in M\quad |\quad x_{ij}=1\}$. On dira qu'un nœud $(i,j)$ est à la distance $k$ d'un nœud $(m,n)$ si il existe une chaîne de taille $k$ allant de $(i,j)$ vers $(m,n)$.
+
+
+Soit $\forall{(i,j,k)}\in M\times\llbracket 0;Card(M)-1\rrbracket \quad S_{i,j,k}$ qui vaut $1$ si le nœud $(i,j)$ est à la distance $k$ d'un nœud central $(i_0,j_0)$ et $0$ sinon. On lui associe les contraintes suivante : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
+\sum\limits_{(k)\in M} S_{ijk} = x_{ij}\\
+\forall{(i,j,k)}\in M\times N S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+\end{array}
+\right.
+\end{equation}
+
+Où $N = \llbracket 0;Card(M)-1\rrbracket$
+
+\begin{itemize}
+\item La première contrainte assure de choisir un et un seul nœud central
+\item La seconde contrainte assure de n'attribuer de distance que pour les mailles de $Z$
+\item La dernière contrainte assure que $(i,j)$ ne peut être à la distance $k$ du nœud centrale que si au moins l'un de ses voisins est à la distance $k-1$.
+\end{itemize}
+
+Le problème global s'écrit donc : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_{ij}\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}p_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}a_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+	\begin{array}{lll}
+		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
+		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
+		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		\forall{k} \in N&\sum\limits_{(k)\in M} S_{ijk} = x_{ij}&\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
+		\forall{(i,j,k)} \in M \times N&S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+	\end{array}
+	
+\end{array}
+\right.
+\end{equation}
+\end{document}
