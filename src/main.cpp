@@ -1,7 +1,5 @@
 #include "common.hpp"
-
-
-
+#include "instance.hpp"
 #include "options.hpp"
 
 // je dois définir cette variable statique en dehors de la classe Options
@@ -19,9 +17,12 @@ int main(int argc, char *argv[]) {
 
     // Exemple d'affichage de quelques options
 
-    if(args->solver ==2){
-    	cout << "filename : " << args->filename << endl;
-    }
+
+    cout << "Lecture du fichier : " << args->filename << endl;
+    Instance inst(args->filename);
+    cout << "main Instance lue" << endl;
+    //cout << inst << endl;
+
 
 
 
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     // exit(0);
 
-
+    delete args;
     return 0;
 }
 //./

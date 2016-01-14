@@ -26,21 +26,30 @@ private:
 	//lecture des données
 	string filename;
 	void read_data();
-public:
 
+
+public:
+	//constructeur
+	Instance(string filename);
+
+	//destructeur
+	~Instance();
+
+	//affichage
+	friend ostream & operator <<(ostream &os, Instance inst);
 	//accesseurs
 
 	int get_n(){return n;}
-	void set_n(int n){this->n = n;}
+	int& set_n(){return this->n;}
 
 	int get_m(){return m;}
-	void set_m(int m){this->m = m;}
+	int& set_m(){return this->m;}
 
 	double get_Ba(){return Ba;}
-	void set_Ba(double Ba){this->Ba = Ba;}
+	double& set_Ba(){return this->Ba;}
 
 	double get_Bp(){return Bp;}
-	void set_Bp(double Bp){this->Bp = Bp;}
+	double& set_Bp(){return this->Bp;}
 
 	Maille get_grille(Coordinate coord){return grille[coord];}
 	void set_grille(Coordinate coord, Maille maille){grille[coord] = maille;}
