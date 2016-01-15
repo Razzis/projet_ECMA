@@ -19,8 +19,11 @@ int main(int argc, char *argv[]) {
 
 
     cout << "Lecture du fichier : " << args->filename << endl;
-    Instance inst(args->filename);
+    Instance inst =  Instance(args->filename);//
     cout << "main Instance lue" << endl;
+    cout << "geg" << endl;
+    cout << inst << endl;
+    //cout << inst.get_grille(Coordinate(1,1)) << endl;
     //cout << inst << endl;
 
 

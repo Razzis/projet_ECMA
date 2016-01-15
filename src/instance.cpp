@@ -6,6 +6,11 @@
  */
 #include "instance.hpp"
 
+
+Instance::~Instance(){
+
+}
+
 Instance::Instance(string filename){
 	this->filename = filename;
 
@@ -15,7 +20,7 @@ Instance::Instance(string filename){
 	this->Ba = -1;
 	this->Bp = -1;
 
-	this->grille = map <Coordinate,Maille>();
+	//this->grille = map <Coordinate,Maille>();
 
 	this->read_data();
 
@@ -27,9 +32,7 @@ Instance::Instance(string filename){
 		U::die("Instance::Instance problème à la lecture");
 }
 
-Instance::~Instance(){
 
-}
 
 
 
@@ -47,51 +50,57 @@ void Instance::read_data(){
 			string key = line.substr(0, idx);//on découpe
 			string reste = line.substr(idx);
 			string value = U::trim_string(reste," \t=:"," \t\r\n;,");//on nettoit les retour à la ligne et cie
-
 			if(value.at(0) == '['){//declaration d'une matrice
-				while(it_lines != lines.size() && line.find("=") == string::npos){//tant qu'on est pas à la fin du fichier, ou qu'on ne déclare pas une nouvelles variable
-
-
-
 					string valeur;// stockera les nombres
-
-					Coordinate current_pos(-1,0);
-
-					for(string::iterator it_charactere = ++value.begin(); it_charactere != value.end(); ++it_charactere){//le premier charactère est  un "["
+					Coordinate current_pos(1,1);//on part du coin supérieur gauche
+					cout << "value : " << value << endl;
+					bool entre_crochet = false;//indique si on se trouve dans un bloc et qu'on lit des nombre
+					for(string::iterator it_charactere = value.begin(); it_charactere != value.end()--; ++it_charactere){//le dernier charactère est  un "]"
 						char charactere = *it_charactere;
-						if(charactere == '['){
-							if(key == "Ca")
+						//cout << "Instance::read_data charactere : " << charactere << endl;
+						if(charactere == ']'){
+							cout << "key : " << key << " valeur : " << valeur << endl;
+							if(key == "Ca"){
 								this->grille[current_pos].set_Ca() = stod(valeur);
+							}
 							else if(key == "Cp")
 								this->grille[current_pos].set_Cp()=  stod(valeur);
-							else if(key == "Ha")
+							else if(key == "Ha"){
 								this->grille[current_pos].set_Ha() = stod(valeur);
+							}
 							else if(key == "Hp")
 								this->grille[current_pos].set_Hp() = stod(valeur);
+							current_pos.x = 1;
+							current_pos.y++;
+							++it_charactere;//le charactere suivant est ,
+							entre_crochet = false;
+							valeur.clear();
+
+						}
+						else if(charactere == ',' && entre_crochet){//il y a des virgule entre blocs, qu'on ne veut pas rendre en compte
+							if(key == "Ca"){
+								this->grille[current_pos].set_Ca() = stod(valeur);
+							}
+							else if(key == "Cp")
+								this->grille[current_pos].set_Cp() =  stod(valeur);
+							else if(key == "Ha"){
+								this->grille[current_pos].set_Ha() = stod(valeur);
+							}
+							else if(key == "Hp")
+								this->grille[current_pos].set_Hp() = stod(valeur);
+
 							current_pos.x++;
 							valeur.clear();
 						}
-						if(charactere == ']'){//on change de ligne
-							if(key == "Ca")
-								this->grille[current_pos].set_Ca() = stod(valeur);
-							else if(key == "Cp")
-								this->grille[current_pos].set_Cp() = stod(valeur);
-							else if(key == "Ha")
-								this->grille[current_pos].set_Ha() = stod(valeur);
-							else if(key == "Hp")
-								this->grille[current_pos].set_Hp() = stod(valeur);
-							current_pos.x = 0;
-							current_pos.y++;
-							valeur.clear();
+						else if(charactere == '['){
+							//rien a faire
 						}
 						else{
 							valeur.push_back(charactere);
+							entre_crochet = true;
 						}
-						charactere++;
+						//charactere++;
 					}
-
-					it_lines++;
-				}
 
 			}
 			else{//stockage d'une variable scalaire
@@ -101,10 +110,19 @@ void Instance::read_data(){
 					this->set_m() = stoi(value);
 					for(int i = 1; i<=n; i++){
 						for(int j = 1; j<=m; j++){
+
 							Coordinate coord(i,j);
-							grille[coord] = Maille(coord);
+							//cout << "go" << endl;
+
+							//Maille Current_maille(i,j);
+							//cout << "go" << endl;
+							grille[coord] = Maille(i,j);
+							logn5("Creation of Maille ("+U::to_s(grille[coord].get_coord_x())+","+U::to_s(grille[coord].get_coord_y())+")");
+
 						}
 					}
+					//cout << *this << endl;
+					//U::die("TEST");
 				}
 				if(key == "Ba")
 					this->set_Ba() = stod(value);
@@ -119,17 +137,18 @@ void Instance::read_data(){
 }
 
 
-ostream & operator <<(ostream &os, Instance inst){
+ostream &operator <<(ostream &os, Instance inst){
 	os << "######################" << endl;
-	os << "affichage de l'instance : " << inst.filename;
+	os << "affichage de l'instance : " << inst.filename << endl;
 	os << "grille de taille nxm : " << inst.n << "x" << inst.m << endl;
 	os << "Ba : " << inst.Ba << endl;
 	os << "Bp : " << inst.Bp << endl;
 	os << "----------------------" << endl;
 	os << "Description des mailles : " << endl;
 	for(int i = 1; i <= inst.n; i++){
-		for(int j = 1; j <= inst.n; j++){
-			Maille current_maille = inst.grille[Coordinate(i,j)];
+		for(int j = 1; j <= inst.m; j++){
+			Coordinate coord(i,j);
+			Maille current_maille = inst.grille[coord];
 			os << current_maille << endl;
 		}
 	}

@@ -31,12 +31,12 @@ private:
 public:
 	//constructeur
 	Instance(string filename);
-
+	Instance();
 	//destructeur
 	~Instance();
 
 	//affichage
-	friend ostream & operator <<(ostream &os, Instance inst);
+	friend ostream &operator <<(ostream &os, Instance inst);
 	//accesseurs
 
 	int get_n(){return n;}

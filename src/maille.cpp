@@ -7,31 +7,40 @@
 #include "maille.hpp"
 
 Coordinate::Coordinate(int x, int y){
-	this->x = double(x);
-	this->y = double(y);
+	this->x = x;
+	this->y = y;
 }
 
+
 Coordinate::Coordinate(){
-	this->x = double(-1);
-	this->y = double(-1);
+	this->x = -1;
+	this->y = -1;
+}
+
+Coordinate::Coordinate(const Coordinate& copy_coordinate){
+	this->x = copy_coordinate.x;
+	this->y = copy_coordinate.y;
 }
 
 Coordinate::~Coordinate(){
-
 }
 
 Maille::Maille(){
-	this->coord.x = -1;
-	this->coord.y = -1;
+	//U::die("STOP");
+	this->coord = Coordinate(-1,-1);
 	this->Ca = -1;
 	this->Ha = -1;
 	this->Cp = -1;
 	this->Hp = -1;
+	//U::die("STOP");
 }
 
 Maille::Maille(const Maille& copy_maille){
-	this->coord.x = copy_maille.coord.x;
-	this->coord.y = copy_maille.coord.y;
+	this->coord = Coordinate(copy_maille.get_coord_x(),copy_maille.get_coord_y());
+	//this->coord.x = copy_maille.get_coord_x();
+	//this->coord.y = copy_maille.get_coord_y();
+	//this->coord.x = 1;//copy_maille.coord.x;
+	//this->coord.y = 1;//copy_maille.coord.y;
 	this->Ca = copy_maille.Ca;
 	this->Ha = copy_maille.Ha;
 	this->Cp = copy_maille.Cp;
@@ -39,19 +48,22 @@ Maille::Maille(const Maille& copy_maille){
 }
 
 Maille::Maille(Coordinate coord){
-
-	this->coord.x = coord.x;
-	this->coord.y = coord.y;
+	this->coord = Coordinate(coord.x,coord.y);
 	this->Ca = -1;
 	this->Ha = -1;
 	this->Cp = -1;
 	this->Hp = -1;
 }
-
+Maille::Maille(int x, int y){
+	this->coord = Coordinate(x,y);
+	this->Ca = -1;
+	this->Ha = -1;
+	this->Cp = -1;
+	this->Hp = -1;
+}
 Maille::Maille(int x, int y, int Ca, int Ha, int Cp, int Hp){
 
-	this->coord.x = x;
-	this->coord.y = y;
+	this->coord = Coordinate(x,y);
 	this->Ca = Ca;
 	this->Ha = Ha;
 	this->Cp = Cp;
