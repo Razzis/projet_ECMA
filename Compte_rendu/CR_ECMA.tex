@@ -59,10 +59,19 @@ La contrainte s'écrit aussi :
 
 \begin{equation}
 \begin{array}{l}
-\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}) + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}) \geq 2(\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl})(\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl})\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}) + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}) \geq 2(\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl})(\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl})\\
 \end{array}
 \end{equation}
 
+On Constate que cette formulation n'est équivalente à la première que si $\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl}$ et $\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl}$ sont non nulles. 
+
+Il faut donc ajouter les contraintes : 
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl}\geq 0\\
+\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl}\geq 0
+\end{array}
+\end{equation}
 Définissons les variables réelles $p$ et $a$ telle que  : 
 \begin{equation}
 \begin{array}{l}
@@ -75,7 +84,7 @@ Les contraintes du problème d'optimisation s'écrivent alors :
 \begin{equation}
 \left\{
 \begin{array}{l}
-\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}px_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}ax_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}px_{ij})\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}ax_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}px_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}px_{ij})\\
 p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
 a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
 \end{array}
@@ -104,13 +113,14 @@ Ainsi, on définit le problème linéarisé :
 \left\{
 \begin{array}{l}
 \max \sum\limits_{(i,j)\in M} x_{ij}\\
-\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}p_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}a_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
 	\begin{array}{lll}
 		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
 		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
 		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
 		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
-		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		&p > 0&a > 0
 	\end{array}
 \end{array}
 \right.
@@ -128,7 +138,7 @@ Soit $\forall{(i,j,k)}\in M\times\llbracket 0;Card(M)-1\rrbracket \quad S_{i,j,k
 \begin{array}{l}
 \sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
 \sum\limits_{(k)\in M} S_{ijk} = x_{ij}\\
-\forall{(i,j,k)}\in M\times N S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+\forall{(i,j,k)}\in M\times N \quad S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
 \end{array}
 \right.
 \end{equation}
@@ -147,18 +157,29 @@ Le problème global s'écrit donc :
 \left\{
 \begin{array}{l}
 \max \sum\limits_{(i,j)\in M} x_{ij}\\
-\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}p_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}a_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
 	\begin{array}{lll}
 		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
 		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
 		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
 		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
 		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		&p > 0&a > 0\\
 		\forall{k} \in N&\sum\limits_{(k)\in M} S_{ijk} = x_{ij}&\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
-		\forall{(i,j,k)} \in M \times N&S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+		\forall{(i,j,k)} \in M \times N&S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
 	\end{array}
 	
 \end{array}
 \right.
 \end{equation}
+
+(Les effets de bords pour la dernière contrainte ne sont pas spécifiés pour simplifier les notations)
+
+\subsection{Remarque}
+
+Les résultat seront présentés dans le rapport final, mais on peut déjà constater que la contrainte de connexité engendre un nombre très important de variable de décision (De l'ordre de $Card(M)^2$). Même sur des instance de taille très raisonnable (10x10), on génère 10000 variables. Une première question sera donc de se demander si on peut limiter le nombre de variable à ajouter pour définir les contraintes de connexité.
+
+De plus, on peut remarquer que dans la solution final, les valeurs des $S_{ijk}$ sont presque toute nulles. On a donc fortement intérêt à brancher de préférence $S_{ijk}$ vers sa valeur inférieur (nulle ici) dans le branch and cut.
+
+Les résultats et d'autre améliorations présentées dans le rapport final.
 \end{document}
