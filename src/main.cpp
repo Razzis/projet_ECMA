@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "instance.hpp"
 #include "options.hpp"
+#include "solver.hpp"
 
 // je dois définir cette variable statique en dehors de la classe Options
 Options* Options::args = NULL;
@@ -20,11 +21,23 @@ int main(int argc, char *argv[]) {
 
     cout << "Lecture du fichier : " << args->filename << endl;
     Instance inst =  Instance(args->filename);//
-    cout << "main Instance lue" << endl;
-    cout << "geg" << endl;
     cout << inst << endl;
-    //cout << inst.get_grille(Coordinate(1,1)) << endl;
-    //cout << inst << endl;
+
+
+    if(args->solver == 2){
+    	PLNE pl_solver(inst);
+
+    	cout << "pl_solver initialized " << endl;
+    	pl_solver.solve();
+
+    	cout << "Solution : " << endl;
+    	cout << pl_solver.get_solution() << endl;
+
+
+
+
+    }
+
 
 
 
