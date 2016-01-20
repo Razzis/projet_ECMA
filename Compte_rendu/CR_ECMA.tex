@@ -24,191 +24,292 @@
 \usepackage[export]{adjustbox}
 \usepackage{listings}
 \usepackage{amsthm}
-\author{HASSAN Lucas, NGUYEN Le Thanh Dung}
-\date{17 janvier 2015}
+\author{HASSAN Lucas, NGUYEN Tito}
+\date{décembre 2015}
 \usepackage{amsfonts}
 \usepackage{stmaryrd}
 
 \begin{document}
 
 
-\title{Rapport d'étape du projet ECMA (MPRO)}
+\title{Rapport d'étape du projet ECMA}
 
 \maketitle{}
-
-\section{Modélisation du problème sous la forme d'un programme linéaire}
-
-\subsection{Modélisation du problème en ignorant la connexité}
-
-\subsubsection{Modélisation initiale}
-
+\section{Modélisation du problème sous la forme d'un PL}
+\subsection{Modélisation naïve du problème}
 Dans un premier temps, on ne s'intéresse pas à la contrainte de connexité du problème.
-Celui-ci se modélise alors naturellement de la façon suivante : 
 
-\begin{align*}
-\text{maximiser} &\quad \sum_{(i,j)\in M} x_{ij} \\
-\text{sous contraintes} &\quad H^p(Z)+H^a(Z) \geq 2 \\
-&\quad x_{ij} \in \{0,1\} \text{ pour tout } (i,j) \in M
-\end{align*}
 
-où $Z = \{(i,j) \in M \mid x_{ij} = 1\}$, de sorte que la fonction
-objectif soit le cardinal de $Z$, et
-\begin{align*}
-H^p(Z) &= \dfrac{\displaystyle\sum_{(i,j)\in Z} H^p_{ij}C^p_{ij}}{\displaystyle\sum_{(i,j)\in Z} C^p_{ij}} = \dfrac{\displaystyle\sum_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}}{\displaystyle\sum_{(i,j)\in M} C^p_{ij}x_{ij}} \\
-H^a(Z) &= \dfrac{\displaystyle\sum_{(i,j)\in Z} H^p_{ij}C^a_{ij}}{\displaystyle\sum_{(i,j)\in Z} C^a_{ij}} = \dfrac{\displaystyle\sum_{(i,j)\in M} H^p_{ij}C^a_{ij}x_{ij}}{\displaystyle\sum_{(i,j)\in M} C^a_{ij}x_{ij}}
-\end{align*}
+Le problème se modélise alors naturellement de la façon suivante : 
 
-Cette formulation contient des variables binaires (0--1), une fonction
-objectif linéaire, et une contrainte \textit{fractionnaire}.
+\begin{equation}
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_i{ij}\\
+H^p(M)+H^a(M) \geq 2
+\end{array}
+\end{equation}
 
-\subsubsection{Linéarisation de la contrainte fractionnaire}
+Où $H^p(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}}$ et $H^a(M) = \frac{\sum\limits_{(i,j)\in M} H^p_{ij}C^a_{ij}x_{ij}}{\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}}$
 
-On veut se ramener à un programme linéaire en nombres entiers. 
+\subsection{Linéarisation de la modélisation}
 
-Introduisons les variables réelles $p$ et $a$ telles que :
-\[ p = \sum_{(i,j)\in M} C^p_{ij}x_{ij} \qquad a = \sum_{(i,j)\in M} C^a_{ij}x_{ij} \]
+On remarque que la contrainte définie est fractionnaire. Ainsi on choisit la linéariser de la manière suivante : 
 
-On a alors $p \geq 0$, $a \geq 0$, et dès que $(x_{ij})$ n'est pas
-identiquement nul -- ce qui sera le cas de la solution optimale, étant
-donnée la fonction qu'on cherche à maximiser -- on a $p > 0$ et
-$a > 0$. On peut donc multiplier la contrainte par $pa$ pour obtenir
-la formulation équivalente
-\[ \sum_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}a + \sum_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}p
-\geq 2pa = \sum_{(k,l)\in M} 2C^a_{kl}x_{kl}p
-\]
+La contrainte s'écrit aussi : 
 
-On a désormais un programme \textit{quadratique} en variables 0--1,
-reste à le linéariser. Définissons, pour tout $(i,j)\in M$,
-$a_{ij}=ax_{ij}$ et $p_{ij}=px_{ij}$. On sait que les 4 inégalités
-\textit{linéaires} :
-\begin{align*}
-a_{ij} &\leq a_{\mathrm{max}}x_{ij}\\
-a_{ij} &\leq a\\
-a_{ij} &\geq (x_{ij}-1)a_{\mathrm{max}}+a\\
-a_{ij} &\geq 0
-\end{align*}
-sont équivalentes à $a_{ij} = ax_{ij}$ lorsque $x_{ij} \in \{0,1\}$ et
-$a \in [0,a_{\textrm{max}}]$. On peut prendre la constante
-$a_{\mathrm{max}} = \sum_{(i,j)\in M} C^a_{ij}$ comme majorant trivial
-de $a$. Il en va de même pour l'égalité $p_{ij}=px_{ij}$.
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij}) + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}x_{ij}(\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij}) \geq 2(\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl})(\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl})\\
+\end{array}
+\end{equation}
 
-Ainsi, le problème linéarisé est : 
-\begin{align*}
-\max &\quad \sum_{(i,j)\in M} x_{ij}\\
-\text{s.c.} &\quad  \sum_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq \sum_{(i,j)\in M} 2C^a_{ij}p_{ij}\\
-&\quad  \begin{array}{lll}
-    \forall{(i,j)} \in M&a_{ij}\leq a_{\mathrm{max}}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
-    \forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
-    \forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{\mathrm{max}}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
-                        &a = \displaystyle\sum_{(i,j)\in M} C^a_{ij}x_{ij}&p = \displaystyle\sum_{(i,j)\in M} C^p_{ij}x_{ij}\\
-    \forall{(i,j)} \in M & x_{ij} \in \{0,1\},\; a_{ij}, p_{ij} \in \mathbb{R}_+ \\
+On Constate que cette formulation n'est équivalente à la première que si $\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl}$ et $\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl}$ sont non nulles. 
+
+Il faut donc ajouter les contraintes : 
+\begin{equation}
+\begin{array}{l}
+\sum\limits_{(k,l)\in M} C^p_{kl}x_{kl}\geq 0\\
+\sum\limits_{(k,l)\in M} C^a_{kl}x_{kl}\geq 0
+\end{array}
+\end{equation}
+Définissons les variables réelles $p$ et $a$ telle que  : 
+\begin{equation}
+\begin{array}{l}
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\end{equation}
+
+Les contraintes du problème d'optimisation s'écrivent alors : 
+\begin{equation}
+\left\{
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}ax_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}px_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}px_{ij})\\
+p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})
+\end{array}
+\right.
+\end{equation}
+
+On définit ensuite $\forall (i,j)\in M\quad a_{ij}=ax_{ij}$ et $p_{ij}=px_{ij}$
+
+
+
+On sait que l’égalité $a_{ij}=ax_{ij}$ s’écrit encore : 
+\begin{equation}
+\begin{array}{l}
+a_{ij}\leq a_{max}x_{ij}\\
+a_{ij}\leq a\\
+a_{ij}\geq (x_{ij}-1)a_{max}+a\\
+a_{ij} \geq 0
+\end{array}
+\end{equation}
+
+où $a_{max}$ est une borne supérieur de $a$. Une borne supérieur triviale de $a$ est ici $\sum\limits_{(i,j)\in M} C^a_{ij}$. Il en est de même pour la contrainte $p_{ij}=px_{ij}$.
+
+Ainsi, on définit le problème linéarisé : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_{ij}\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+	\begin{array}{lll}
+		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
+		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
+		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		&p > 0&a > 0
 	\end{array}
-\end{align*}
-les variables de décision étant donc les $x_{ij}$, $a_{ij}$ et $p_{ij}$.
+\end{array}
+\right.
+\end{equation}
 
 \subsection{Prise en compte de la contrainte de connexité}
 
-Une commune peut être représentée par un graphe non orienté tel que
-chaque maille $(i,j)$ soit un nœud du graphe, les nœuds étant reliés
-par des arêtes si les mailles correspondantes sont adjacentes dans
-$M$. La contiguïté des mailles de $Z$ est alors équivalente à la
-connexité du sous-graphe induit par le sous-ensemble de sommets $Z$.
+Une commune peut être représentée par un graphe non orienté tel que chaque chaque maille $(i,j)$ est un nœud du graphe, les nœuds étant reliés par des arrêtes si les mailles correspondante sont adjacentes dans $Z=\{(i,j)\in M\quad |\quad x_{ij}=1\}$. On dira qu'un nœud $(i,j)$ est à la distance $k$ d'un nœud $(m,n)$ si il existe une chaîne de taille $k$ allant de $(i,j)$ vers $(m,n)$.
 
-Un graphe non vide est connexe si et seulement s'il existe un sommet
-relié à tous les autres. Considérons une maille \og{}centrale\fg{}
-$(i_0,j_0) \in Z$ qu'on distinguera des autres. À partir de celle-ci,
-affectons aux autres une \textit{distance} de sorte que si
-$(i,j) \in Z$ est à distance $k$ (sous-entendu : du centre), alors il
-existe un chemin entre $(i_0, j_0)$ et $(i,j)$ passant par des nœuds
-de distances successives $0, 1, \ldots, k$. Un tel chemin étant simple
-il ne peut pas être de longueur plus grande que le nombre de nœuds du
-graphe ; par conséquent, $k \leq |M| - 1$. (Attention, la distance
-n'est pas forcément la longueur du \textit{plus court} chemin !)
 
-Il est alors clair que les mailles auxquelles on peut attribuer une
-distance sont alors celles accessibles à partir de $(i_0, j_0)$,
-c'est-à-dire la composante connexe du nœud central. La connexité se
-caractérise ainsi par l'existence d'une distance pour toutes les
-mailles de $Z$, pour un certain choix de centre.
+Soit $\forall{(i,j,k)}\in M\times\llbracket 0;Card(M)-1\rrbracket \quad S_{i,j,k}$ qui vaut $1$ si le nœud $(i,j)$ est à la distance $k$ d'un nœud central $(i_0,j_0)$ et $0$ sinon. On lui associe les contraintes suivante : 
 
-%   On dira qu'un nœud $(i,j)$ est à distance
-% $k$ d'un nœud $(m,n)$ si il existe une chaîne de taille $k$ allant de
-% $(i,j)$ vers $(m,n)$.
+\begin{equation}
+\left\{
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
+\sum\limits_{(k)\in M} S_{ijk} = x_{ij}\\
+\forall{(i,j,k)}\in M\times N \quad S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+\end{array}
+\right.
+\end{equation}
 
-Introduisons donc les variables de décision $S_{i,j,k}$, pour
-$(i,j,k) \in M \times \llbracket 0 \,;\, |M|-1 \rrbracket$ valant :
-\begin{itemize}
-\item $1$ si le nœud $(i,j)$ est dans $Z$ et se trouve à distance $k$ du nœud central,
-\item $0$ sinon.
-\end{itemize}
-Ce que l'on spécifie par les contraintes suivantes :
-\begin{align*}
-  & \sum_{(i,j)\in M} S_{i,j,0} = 1\\
-  \forall{(i,j)}\in M, &\; \sum_{k = 0}^{|M|} S_{ijk} = x_{ij}\\
-  \forall{(i,j,k)}\in M \times \llbracket 1 \,;\, |M|-1
-  \rrbracket,&\; S_{i,j,k} \leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
-\end{align*}
-(Afin que la dernière inégalité ait un sens pour les mailles au bord
-de la grille, on considérera que lorsque $(i,j) \not\in M$, $S_{ijk}$
-dénote non pas l'une des variables de décision mais la constante $0$.)
-
-% (Les effets de bords pour la dernière contrainte ne sont pas spécifiés pour simplifier les notations)
+Où $N = \llbracket 0;Card(M)-1\rrbracket$
 
 \begin{itemize}
-\item La première contrainte assure de choisir un et un seul nœud central. En effet, on ne spécifie pas la maille centrale à l'avance, elle sera caractérisée par $S_{i_0, j_0, 0} = 1$.
-\item La seconde contrainte joue deux rôles :
-  \begin{itemize}
-  \item dans le cas où $x_{ij}=0$ elle s'assure de n'attribuer de
-    distance que pour les mailles de $Z$, ce qui garantit qu'on ne
-    relie pas deux sommets par un chemin qui intersecte
-    $M \setminus Z$ ;
-  \item dans le cas où $x_{ij}=1$, elle force la maille à se voir
-    attribuer exactement une distance, ce qui ne pourra pas être le
-    cas si elle n'est pas accessible. Cette contrainte sera donc
-    violée si $Z$ n'est pas connexe.
-  \end{itemize}
-\item La dernière contrainte assure que $(i,j)$ ne peut être à distance $k$ que si au moins l'un de ses voisins est à distance $k-1$. Ainsi, ce voisin sera un prédécesseur possible de $(i,j)$ dans un chemin de longueur $k$ partant de la maille centrale.
+\item La première contrainte assure de choisir un et un seul nœud central
+\item La seconde contrainte assure de n'attribuer de distance que pour les mailles de $Z$
+\item La dernière contrainte assure que $(i,j)$ ne peut être à la distance $k$ du nœud centrale que si au moins l'un de ses voisins est à la distance $k-1$.
 \end{itemize}
 
-% Le problème global s'écrit donc : 
+Le problème global s'écrit donc : 
 
-% \begin{equation}
-% \left\{
-% \begin{array}{l}
-% \max \sum_{(i,j)\in M} x_{ij}\\
-% \sum_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum_{(i,j)\in M} C^a_{ij}p_{ij})\\
-% 	\begin{array}{lll}
-% 		\forall{(i,j)} \in M&a_{ij}\leq a_{\mathrm{max}}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
-% 		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
-% 		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{\mathrm{max}}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
-% 		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
-% 		&a = (\sum_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum_{(i,j)\in M} C^p_{ij}x_{ij})\\
-% 		&p > 0&a > 0\\
-% 		\forall{k} \in N&\sum_{(k)\in M} S_{ijk} = x_{ij}&\sum_{(i,j)\in M} S_{i,j,0} = 1\\
-% 		\forall{(i,j,k)} \in M \times N&S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
-% 	\end{array}
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max \sum\limits_{(i,j)\in M} x_{ij}\\
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+	\begin{array}{lll}
+		\forall{(i,j)} \in M&a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
+		\forall{(i,j)} \in M&a_{ij}\leq a&p_{ij}\leq p\\
+		\forall{(i,j)} \in M&a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+		\forall{(i,j)} \in M&a_{ij} \geq 0&p_{ij} \geq 0\\
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		&p > 0&a > 0\\
+		\forall{k} \in N&\sum\limits_{(k)\in M} S_{ijk} = x_{ij}&\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
+		\forall{(i,j,k)} \in M \times N&S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+	\end{array}
 	
-% \end{array}
-% \right.
-% \end{equation}
+\end{array}
+\right.
+\end{equation}
 
-\subsubsection{Remarques}
+(Les effets de bords pour la dernière contrainte ne sont pas spécifiés pour simplifier les notations)
 
-Les résultats seront présentés dans le rapport final, mais on peut
-déjà constater que la contrainte de connexité engendre un nombre très
-important de variables de décision (de l'ordre de $|M|^2$). Même sur
-des instances de taille très raisonnable ($10 \times 10$), on génère
-10000 variables. Une première question sera donc de se demander si on
-peut limiter le nombre de variables à ajouter pour définir les
-contraintes de connexité.
+\subsection{Remarque}
 
-De plus, on peut remarquer que dans la solution finale, les valeurs
-des $S_{ijk}$ sont presque toutes nulles. En effet, si les $x_{ij}$
-définissent un ensemble de mailles $Z$, on aura seulement
-$|Z| \leq |M|$ valeurs non nulles de $S_{ijk}$ parmi $|M|^2$ variables
-au total ! On a donc fortement intérêt à brancher de préférence
-$S_{ijk}$ vers sa valeur inférieure (nulle ici) dans le branch and cut.
+Les résultat seront présentés dans le rapport final, mais on peut déjà constater que la contrainte de connexité engendre un nombre très important de variable de décision (De l'ordre de $Card(M)^2$). Même sur des instance de taille très raisonnable (10x10), on génère 10000 variables. Une première question sera donc de se demander si on peut limiter le nombre de variable à ajouter pour définir les contraintes de connexité.
 
-Les résultats et d'autres améliorations seront présentés dans le
-rapport final.
+De plus, on peut remarquer que dans la solution final, les valeurs des $S_{ijk}$ sont presque toute nulles. On a donc fortement intérêt à brancher de préférence $S_{ijk}$ vers sa valeur inférieur (nulle ici) dans le branch and cut.
+
+Les résultats et d'autre améliorations présentées dans le rapport final.
+
+\section{Résolution du problème par décomposition-coordination}
+
+Lorsque qu'un problème est trop complexe pour être résolue de manière frontal (nombre de variables et/ou de contraintes trop élevé), il peut être intéressant d'utiliser des méthodes dites de décomposition-coordination qui consistent à définir une suite de sous problèmes plus simple à résoudre dont les solutions successives convergent vers la solution du problème initiale.
+
+Ces méthodes s'appliquent particulièrement lorsque qu'une ou plusieurs contrainte du problème se trouvent être couplante. L'application des techniques de décomposition-coordination peut permettre de faire apparaître des problèmes découplés et donc beaucoup plus facile à résoudre. 
+
+On choisira ici de présenter quelque méthodes usuelles et de présenter le résultats de leur implémentation sur le problème considéré. Pour plus de détail sur les méthodes de décomposition-coordination on pourra consulter à profit le support de cours accompagnant le cours "Optimisation des grands systèmes de Pierre CARPENTIER (http://perso.ensta-paristech.fr/~pcarpent/A8-4/)
+
+\subsection{Considération générale sur le problème}
+
+La formulation du problème tel que présenté plus haut nous montre que les seuls contraintes couplant $S$ et les autres variables du problèmes sont les contraintes : 
+\begin{equation}
+\forall{(i,j)} \in M \quad \sum\limits_{(k)\in M} S_{ijk} = x_{ij}
+\end{equation}
+
+Le coût est quand à lui totalement découplé ($S$ n'y intervient pas). On sait que la difficulté de résoudre le problème global vient surtout de l'apparition des variables $S$ et des contraintes liées à la connexité. Il apparaît donc intéressant d'essayer de découpler le problème en $S$ et le reste du problème.
+
+Soit : $S_{ad}\subset \{0,1\}^{Card(M)} \times \{0,1\}^{N} $ tel que $\forall (i,j,k) \in M\times N$, $S_{ijk}$ respecte les contraintes suivante : 
+\begin{equation}
+\left\{
+	\begin{array}{l}
+		\sum\limits_{(i,j)\in M} S_{i,j,0} = 1\\
+		S_{i,j,k}\leq S_{i-1,j,k-1} + S_{i+1,j,k-1} + S_{i,j-1,k-1} + S_{i,j+1,k-1}
+	\end{array}
+\right.
+\end{equation}
+
+De même on définit $X_{ad}\subset \{0,1\}^{Card(M)}\times \mathbb{R}^{Card(M)}\times \mathbb{R}^{Card(M)} \times \mathbb{R} \times \mathbb{R}$ tel que pour $(x,A,P,a,p)\in X_{ad}$, $\forall (i,j)$, $x_{ij}$, $A_{ij}$, $P_{ij}$, $a$, $p$ respectent les contraintes suivante : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\sum\limits_{(i,j)\in M} H^p_{ij}C^p_{ij}a_{ij} + \sum\limits_{(i,j)\in M} H^a_{ij}C^a_{ij}p_{ij} \geq 2(\sum\limits_{(i,j)\in M} C^a_{ij}p_{ij})\\
+	\begin{array}{lll}
+		a_{ij}\leq a_{max}x_{ij}&p_{ij}\leq p_{max}x_{ij}\\
+		a_{ij}\leq a&p_{ij}\leq p\\
+		a_{ij}\geq (x_{ij}-1)a_{max}+a&p_{ij}\geq (x_{ij}-1)p_{max}+p\\
+		a_{ij} \geq 0&p_{ij} \geq 0\\
+		&a = (\sum\limits_{(i,j)\in M} C^a_{ij}x_{ij})&p = (\sum\limits_{(i,j)\in M} C^p_{ij}x_{ij})\\
+		&p > 0&a > 0\\
+	\end{array}
+\end{array}
+\right.
+\end{equation}
+
+Le problème global s'écrit alors : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{(x,A,P,a,p)\in X_{ad}\\S\in S_{ad}} }\quad \sum\limits_{(i,j)\in M} x_{ij}\\
+\\
+	\begin{array}{ll}
+		\forall{(i,j)} \in M&\sum\limits_{(k)\in N} S_{ijk} = x_{ij}\\
+		\end{array}
+\end{array}
+\right.
+\end{equation}
+
+Pour simplifier l'écriture, les variables $A$, $P$, $p$ et $a$ étant muette dans cette formulation, on écrira le problème comme suis : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{x\in X_{ad}\\S\in S_{ad}} }\quad\sum\limits_{(i,j)\in M} x_{ij}\\
+\\
+	\begin{array}{ll}
+		\forall{(i,j)} \in M&\sum\limits_{k\in N} S_{ijk} = x_{ij}\\
+		\end{array}
+\end{array}
+\right.
+\end{equation}
+\subsection{Décomposition par les prix}
+
+
+Intuitivement la méthode de méthode de décomposition par les prix consiste à donner $\forall{(i,j)}\in M$ un prix $\lambda_{ij}^l\in \mathbb{R}$ à la quantité $\sum\limits_{k\in N} S_{ijk} - x_{ij}$ et à résoudre les sous-problèmes : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{x\in X_{ad}\\S\in S_{ad}} }\quad\sum\limits_{(i,j)\in M} x_{ij} + \sum\limits_{(i,j)k\in M}[\lambda_{ij}^l \sum\limits_{k\in N} S_{ijk} - x_{ij}]\\
+\end{array}
+\right.
+\end{equation}
+
+On montre qu'on peut trouver une matrice de prix $\lambda^*_{ij}$ tel que la valeur de la solution associée soit égale à la valeur de la solution du problème initiale. Dans ce cas, on a nécessairement $\forall (i,j) \in M \quad \sum\limits_{k\in N} S_{ijk} - x_{ij} = 0$ et la solution trouvée sera donc solution optimal du problème initial.
+
+Cette algorithme correspond à l'algorithme de relaxation lagrangienne. Ainsi on met à jour $\lambda^l=(\lambda_{ij}^l)_{(i,j)\in M}$ comme suit : 
+
+$\forall (i,j) \in M \forall l \in \mathbb{N}\quad
+ \lambda_{ij}^{l+1} = \lambda_{ij}^{l}+\rho_l (\sum\limits_{k\in N} S_{ijk} - x_{ij})$
+ 
+Pour assurer la convergence de l'algorithme on devra choisir la suite $\rho_l$ de pas positive, convergeant vers $0$ et tel que sa série diverge.
+
+Appliquons cette décomposition à notre problème : 
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{x\in X_{ad}\\S\in S_{ad}} }\quad\sum\limits_{(i,j)\in M} x_{ij}\sum\limits_{(i,j)\in M}[\lambda_{ij}^l \sum\limits_{k\in N} S_{ijk} - x_{ij}]\\
+\end{array}
+\right.
+\end{equation}
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{x\in X_{ad}\\S\in S_{ad}} }\quad\sum\limits_{(i,j)\in M} x_{ij}(1-\lambda_{ij}^l)\sum\limits_{(i,j)\in M}[\lambda_{ij}^l \sum\limits_{k\in N} S_{ijk}]\\
+\end{array}
+\right.
+\end{equation}
+
+
+\begin{equation}
+\left\{
+\begin{array}{l}
+\max\limits_{\substack{x\in X_{ad}} }\quad\sum\limits_{(i,j)\in M} x_{ij}(1-\lambda_{ij}^l)+ \max\limits_{\substack{S\in S_{ad}}} \quad \sum\limits_{(i,j)\in M}[\lambda_{ij}^l \sum\limits_{k\in N} S_{ijk}]\\
+\end{array}
+\right.
+\end{equation}
+
+On a donc bien découplé le problème en $x$ et en $S$. Notons $P1$ et $P2$ les sous problèmes respectivement en $x$ et $S$ qui viennent d'être définit.
+
+Interprétation : a faire ...
+
+
+\subsection{Décomposition par prédiction}
+
+
 \end{document}
