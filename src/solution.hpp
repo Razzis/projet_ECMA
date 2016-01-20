@@ -16,6 +16,8 @@ private:
 	double Hp;
 	double Ha;
 
+	double cost;
+
 	Instance inst;//  l'instance qui crée la solution
 
 public:
@@ -34,6 +36,9 @@ public:
 
 	double get_Hp(){return this->Hp;}
 	double& set_Hp(){return this->Hp;}
+
+	double get_cost(){return this->cost;}
+	double& set_cost(){return this->cost;}
 
 	Instance get_inst(){return this->inst;}
 

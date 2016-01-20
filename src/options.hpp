@@ -228,6 +228,8 @@ class Options  {
         parser->add_int_option("--solver", this->solver)
               ->set_desc(buf.str())
               ->add_alias("-s")
+              ->add_abbrev("--plne_lag", 1)
+              ->add_abbrev("-P_lag", 1)
               ->add_abbrev("--plne", 2)
               ->add_abbrev("-P", 2)
               ->add_abbrev("--carlo", 3)

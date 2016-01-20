@@ -19,6 +19,7 @@ Solution::Solution(Instance& inst){
 
 	this->Ha = 0;
 	this->Hp = 0;
+	this->cost = -1;
 
 	this->inst = inst;
 }
@@ -33,7 +34,7 @@ Solution::Solution(const Instance& inst){
 
 	this->Ha = 0;
 	this->Hp = 0;
-
+	this->cost = -1;
 	this->inst = inst;
 }
 
@@ -41,7 +42,7 @@ Solution::Solution(const Solution& copy_sol){
 	this->Ha = copy_sol.Ha;
 	this->Hp = copy_sol.Hp;
 	this->inst = copy_sol.inst;
-
+	this->cost = copy_sol.cost;
 	this->Choix_maille = copy_sol.Choix_maille;
 
 
@@ -53,6 +54,7 @@ const Solution& Solution::operator=(const Solution copy_sol){
 	this->inst = copy_sol.inst;
 	this->Ha = copy_sol.Ha;
 	this->Hp = copy_sol.Hp;
+	this->cost = copy_sol.cost;
 
 	return *this;
 }
@@ -66,6 +68,7 @@ Solution::~Solution(){
 ostream & operator <<(ostream &os, Solution Solution){
 	os << "###################################" << endl;
 	os << "#### Affichage de la solution #####" << endl;
+	os << "Cost : " << Solution.cost << endl;
 	os << "Ha(Z) : " << Solution.Ha << ", Hp(Z) : " << Solution.Hp << endl;
 	os << "Afichage de la grille nxm : (" << Solution.inst.get_n() << "," << Solution.inst.get_m() << ")" << endl;
 	for(int j = 1; j <= Solution.inst.get_m(); j++){
