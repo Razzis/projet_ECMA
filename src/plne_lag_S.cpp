@@ -152,6 +152,15 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 
 			Cout += lagrange_multiplier.get(coord)*Sum_Sk;
 
+			string Sum_Sk_cons_name = "Sum_Sk(";
+			Sum_Sk_cons_name += i;
+			Sum_Sk_cons_name += ",";
+			Sum_Sk_cons_name += j;
+			Sum_Sk_cons_name += ")";
+
+			IloConstraint Sum_Sk_cons(Sum_Sk <= 1);
+			Sum_Sk_cons.setName(Sum_Sk_cons_name.c_str());
+			model.add(Sum_Sk_cons);
 
 
 
@@ -219,7 +228,7 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 			//env.out() << "Slacks        = " << vals << endl;
 
 
-			//S.ExtractSol(env,cplex);
+			S.ExtractSol(env,cplex);
 
 
 			Cout.end();

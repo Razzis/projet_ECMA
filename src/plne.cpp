@@ -42,14 +42,16 @@ bool PLNE::solve(){
 	DataVarNumMatrix A("a",inst.get_Ba(),env,this->inst.get_n(),this->inst.get_m());
 	DataVarNumMatrix P("p",inst.get_Bp(),env,this->inst.get_n(),this->inst.get_m());
 
-	DataExprMatrix A_expr(env,this->inst.get_n(),this->inst.get_m());
-	DataExprMatrix P_expr(env,this->inst.get_n(),this->inst.get_m());
+	//DataExprMatrix A_expr(env,this->inst.get_n(),this->inst.get_m());
+	//DataExprMatrix P_expr(env,this->inst.get_n(),this->inst.get_m());
 	IloNumVar a(env,0,inst.get_Ba(),"a");
 	IloNumVar p(env,0,inst.get_Bp(),"p");
 
-	IloExpr a_expr(env);
-	IloExpr p_expr(env);
-	IloExpr handicap(env);
+	//IloExpr a_expr(env);
+	//IloExpr p_expr(env);
+	IloExpr handicap_a(env);
+	IloExpr handicap_p(env);
+
 	IloExpr Cout(env);
 
 
@@ -168,18 +170,21 @@ bool PLNE::solve(){
 
 
 
-			a_expr += x[coord] * this->inst.get_grille(coord).get_Ca();
-			p_expr += x[coord] * this->inst.get_grille(coord).get_Cp();
+			//a_expr += x[coord] * this->inst.get_grille(coord).get_Ca();
+			//p_expr += x[coord] * this->inst.get_grille(coord).get_Cp();
 
 			Cout += x[coord];
-			handicap += this->inst.get_grille(coord).get_Hp() * this->inst.get_grille(coord).get_Cp() * A[coord]
-			         + this->inst.get_grille(coord).get_Ha() * this->inst.get_grille(coord).get_Ca() * P[coord]
-			         - 2 * this->inst.get_grille(coord).get_Ca() * P[coord];
+			handicap_a += this->inst.get_grille(coord).get_Ha() * this->inst.get_grille(coord).get_Ca() * A[coord]
+			         - this->inst.get_grille(coord).get_Ca() * A[coord];
+
+			handicap_p += this->inst.get_grille(coord).get_Hp() * this->inst.get_grille(coord).get_Cp() * x[coord]
+						         - this->inst.get_grille(coord).get_Cp() * P[coord];
 
 
 
 		}
 	}
+
 
 	string Sum_S_ij0_cons_name = "Sum_Sij0";
 
@@ -187,15 +192,23 @@ bool PLNE::solve(){
 	Sum_S_ij0_cons.setName(Sum_S_ij0_cons_name.c_str());
 	model.add(Sum_S_ij0_cons);
 
-	IloConstraint a_def(a == a_expr);
+	/*IloConstraint a_def(a == a_expr);
 	a_def.setName("a_def");
 	model.add(a_def);
 
 	IloConstraint p_def(p == p_expr);
 	p_def.setName("p_def");
-	model.add(p_def);
+	model.add(p_def);*/
 
-	IloConstraint handicap_const(handicap >= 0);
+	IloConstraint handicap_a_const(handicap_a == 0);
+	handicap_a_const.setName("handicap_a");
+	model.add(handicap_a_const);
+
+	IloConstraint handicap_p_const(handicap_p == 0);
+	handicap_p_const.setName("handicap_p");
+	model.add(handicap_p_const);
+
+	IloConstraint handicap_const(p + a >= 2);
 	handicap_const.setName("handicap");
 	model.add(handicap_const);
 	//model.add(p > 0);
@@ -221,6 +234,9 @@ bool PLNE::solve(){
 			const_P += ",";
 			const_P += U::to_s(j);
 			const_P += ")";
+
+			//if(inst.get_grille(coord).get_Ca() == 0 && inst.get_grille(coord).get_Cp() == 0)
+				//model.add(x[coord] == 0);
 
 
 
@@ -270,7 +286,7 @@ bool PLNE::solve(){
 		IloCplex cplex(model);
 
 		//parametre de la résolution
-		for(int i = 1; i <= this->inst.get_n(); i++){
+		/*for(int i = 1; i <= this->inst.get_n(); i++){
 			for(int j = 1; j <= this->inst.get_m(); j++){
 				for(int k = 0; k < dist_max; k++){
 
@@ -281,7 +297,7 @@ bool PLNE::solve(){
 						(0 == inst.get_grille(coord).get_Ca() && 0 == inst.get_grille(coord).get_Cp()))
 					cplex.setDirection(x[coord], IloCplex::BranchUp);// Si Ca et Cp sont nul, ajouter x ne change pas l'admissibilité (sauf eventuellemnt la connexité) et augmente le cout
 			}
-		}
+		}*/
 
 
 
@@ -310,11 +326,12 @@ bool PLNE::solve(){
 			//env.out() << "Slacks        = " << vals << endl;
 
 
-			S.ExtractSol(env,cplex);
+			//S.ExtractSol(env,cplex);
 
 			a.end();
 			p.end();
-			handicap.end();
+			handicap_a.end();
+			handicap_p.end();
 			Cout.end();
 
 
@@ -325,9 +342,11 @@ bool PLNE::solve(){
 			return true;
 		}else{
 
+
 			a.end();
 			p.end();
-			handicap.end();
+			handicap_a.end();
+			handicap_p.end();
 			Cout.end();
 			env.end();
 			U::die("PLNE::Solve Erreur dans la résultion du plne");
