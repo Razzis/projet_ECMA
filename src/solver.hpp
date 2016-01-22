@@ -59,6 +59,23 @@ public:
 
 };
 
+class PLNE_non_connexe : public Solver {
+public:
+	//constructeur
+	PLNE_non_connexe(Instance inst);
+
+	// Destructeur
+	virtual ~PLNE_non_connexe();
+
+
+
+
+	//solve
+	virtual bool solve();
+
+};
+
+
 class PLNE_lag_x : public Solver {
 	/*DataNumMatrix sum_k_S_ijk;//somme sur k des S_ijk
 	DataNumMatrix x_ij;//valeur des Sijk*/

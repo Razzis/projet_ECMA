@@ -40,13 +40,38 @@ DataVarBoolMatrix::~DataVarBoolMatrix(){
 
 DataNumMatrix DataVarBoolMatrix::ExtractSol(IloEnv env, IloCplex cplex, Solution& sol){
 	DataNumMatrix x_ij(env,sol.get_inst().get_n(),sol.get_inst().get_m());
+	double Ca_x = 0;
+	double Cp_x = 0;
+
+	double CaHa_x = 0;
+	double CpHp_x = 0;
+
+	//int Cost = 0;
+
+
 	for(int i = 1; i <= sol.get_inst().get_n(); i++){
 		for(int j = 1; j <= sol.get_inst().get_m(); j++){
 			Coordinate coord(i,j);
+			//if(cplex.getValue(this->Matrix[i-1][j-1]) == 1)
+			//	Cost++;
+			Ca_x += sol.get_inst().get_grille(coord).get_Ca()*cplex.getValue(this->Matrix[i-1][j-1]);
+			Cp_x += sol.get_inst().get_grille(coord).get_Cp()*cplex.getValue(this->Matrix[i-1][j-1]);
+
+			CaHa_x += sol.get_inst().get_grille(coord).get_Ha()*sol.get_inst().get_grille(coord).get_Ca()*cplex.getValue(this->Matrix[i-1][j-1]);
+			CpHp_x += sol.get_inst().get_grille(coord).get_Hp()*sol.get_inst().get_grille(coord).get_Cp()*cplex.getValue(this->Matrix[i-1][j-1]);
+
 			sol.set_Choix_maille(coord) = cplex.getValue(this->Matrix[i-1][j-1]);
 			x_ij[coord] = cplex.getValue(this->Matrix[i-1][j-1]);
 		}
 	}
+
+	//sol.set_cost() = Cost;
+
+	sol.set_Ha() = CaHa_x/Ca_x;
+	sol.set_Hp() = CpHp_x/Cp_x;
+
+
+
 	return x_ij;
 }
 
@@ -57,17 +82,16 @@ DataNumMatrix DataVarBoolMatrix::ExtractSol(IloEnv env, IloCplex cplex, Solution
 DataVarBoolTriMatrix::DataVarBoolTriMatrix(string name, IloEnv env,int n, int m, int K){
 	this->Matrix = IloArray< IloArray<IloBoolVarArray> > (env,n);
 	for(int i = 0; i < n; i++){
-		string tmp_name = name;
-		tmp_name += "(";
-		tmp_name += U::to_s(i+1);
-		tmp_name += ",";
 		this->Matrix[i] = IloArray<IloBoolVarArray>(env,m);
 		for(int j = 0; j < m; j++){
-			string var_name = name;//attribut à nom de la forme x(i,j) à la variable
-			var_name += U::to_s(j+1);
-			var_name += ",";
 			this->Matrix[i][j] = IloBoolVarArray(env,K);
 			for(int k = 0; k < K; k++){
+				string var_name = name;
+				var_name += "(";
+				var_name += U::to_s(i+1);
+				var_name += ",";
+				var_name += U::to_s(j+1);
+				var_name += ",";
 				var_name += U::to_s(k);
 				var_name += ")";
 

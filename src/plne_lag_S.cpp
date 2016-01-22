@@ -153,9 +153,9 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 			Cout += lagrange_multiplier.get(coord)*Sum_Sk;
 
 			string Sum_Sk_cons_name = "Sum_Sk(";
-			Sum_Sk_cons_name += i;
+			Sum_Sk_cons_name += U::to_s(i);
 			Sum_Sk_cons_name += ",";
-			Sum_Sk_cons_name += j;
+			Sum_Sk_cons_name += U::to_s(j);
 			Sum_Sk_cons_name += ")";
 
 			IloConstraint Sum_Sk_cons(Sum_Sk <= 1);
@@ -179,7 +179,7 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 
 
 	// définition fonction objectif
-	model.add(IloMaximize(env, Cout));
+	model.add(IloMinimize(env, Cout));
 
 
 	// Résolution
@@ -202,12 +202,12 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 		cplex.setOut(env.getNullStream());
 		//cplex.setParam(IloCplex::MIPDisplay,0);
 
-		/*size_t pos = this->inst.get_name().find(".");
+		size_t pos = this->inst.get_name().find(".");
 		string lp_name = this->inst.get_name().substr (0,pos);//enlève le .dat à la fin
 		pos = lp_name.find("/");
 		lp_name = lp_name.substr (pos+1);//enleve de data/ au début
 		lp_name += ".lp";
-		cplex.exportModel(lp_name.c_str());*/
+		cplex.exportModel(lp_name.c_str());
 
 
 
@@ -228,7 +228,7 @@ bool PLNE_lag_S::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 			//env.out() << "Slacks        = " << vals << endl;
 
 
-			S.ExtractSol(env,cplex);
+			//S.ExtractSol(env,cplex);
 
 
 			Cout.end();

@@ -8,24 +8,23 @@
 
 
 
-PLNE_lag_x::PLNE_lag_x(Instance inst, IloEnv env) : Solver::Solver(){
-	cout << "PLNE_lag::PLNE_lag(Instance inst, IloEnv env)" << endl;
-	this->name = "PLNE";
+PLNE_non_connexe::PLNE_non_connexe(Instance inst) : Solver::Solver(){
+	cout << "PLNE_non_connexe::PLNE_non_connexe(Instance inst)" << endl;
+	this->name = "PLNE_non_connexe";
 	this->sol = Solution(inst);
 	this->inst = inst;
-	this->env = env;
 	/*this->x_ij = DataNumMatrix(env, inst.get_n(), inst.get_m());
 	this->sum_k_S_ijk = DataNumMatrix(env, inst.get_n(), inst.get_m());*/
 }
 
-PLNE_lag_x::~PLNE_lag_x(){
+PLNE_non_connexe::~PLNE_non_connexe(){
 
 }
 
 
-bool PLNE_lag_x::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& x_ij){
+bool PLNE_non_connexe::solve(){
 
-	IloEnv env = this->env;
+	IloEnv env;
 
 	//definition de l'environnement cplex
 
@@ -61,7 +60,7 @@ bool PLNE_lag_x::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 			a_expr += x[coord] * this->inst.get_grille(coord).get_Ca();
 			p_expr += x[coord] * this->inst.get_grille(coord).get_Cp();
 
-			Cout += (1+lagrange_multiplier.get(coord))*x[coord];
+			Cout += x[coord];
 			handicap += this->inst.get_grille(coord).get_Hp() * this->inst.get_grille(coord).get_Cp() * A[coord]
 			         + this->inst.get_grille(coord).get_Ha() * this->inst.get_grille(coord).get_Ca() * P[coord]
 			         - 2 * this->inst.get_grille(coord).get_Ca() * P[coord];
@@ -155,7 +154,7 @@ bool PLNE_lag_x::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 	try{
 
 		IloCplex cplex(model);
-
+		cplex.setParam(IloCplex::NodeSel, IloCplex::BestBound);
 		//parametre de la résolution
 		for(int i = 1; i <= this->inst.get_n(); i++){
 			for(int j = 1; j <= this->inst.get_m(); j++){
@@ -189,7 +188,7 @@ bool PLNE_lag_x::solve(DataNumMatrix const& lagrange_multiplier, DataNumMatrix& 
 			//env.out() << "Solution value  = " << cplex.getObjValue() << endl;
 
 			this->sol.set_cost() = cplex.getObjValue();
-			x_ij = x.ExtractSol(env, cplex, this->set_solution());
+			x.ExtractSol(env, cplex, this->set_solution());
 
 			//env.out() << "Values        = " << x_sol << endl;
 			//cplex.getSlacks(x_sol, con);

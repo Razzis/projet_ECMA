@@ -56,6 +56,25 @@ int main(int argc, char *argv[]) {
 
 
 
+    }else if(args->solver == 3){
+    	time_t t1;
+    	time(&t1);
+    	PLNE_non_connexe pl_solver(inst);
+
+    	cout << "pl_solver initialized " << endl;
+    	pl_solver.solve();
+
+    	cout << "Solution : " << endl;
+    	cout << pl_solver.get_solution() << endl;
+
+    	time_t t2;
+    	time(&t2);
+
+    	cout << "Solution finded in " << t2-t1 << "s" << endl;
+
+
+
+
     }
 
 

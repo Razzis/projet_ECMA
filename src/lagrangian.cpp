@@ -21,7 +21,7 @@ bool Lagrangian::solve(){
 	logn5("Lagrangian::solve START");
 
 	DataNumMatrix lagrange_multiplier(this->Env, this->inst.get_n(), this->inst.get_m());
-	lagrange_multiplier.set_value(0);
+	lagrange_multiplier.set_value(0.5);
 	DataNumMatrix xij(this->Env, this->inst.get_n(), this->inst.get_m());
 	DataNumMatrix S_ijk(this->Env, this->inst.get_n(), this->inst.get_m());
 	//initialisation du multiplicateur
@@ -37,8 +37,8 @@ bool Lagrangian::solve(){
 	Solution current_sol(this->inst);
 	double last_cost = 10000;//stocke le dernier cout calculé pour calculer le critère d'arret
 	double current_cost = 1;
-	double eps = 0.005;//variation du cout accepté
-	double rho = 10;//coefficient pour mettre à jour lambda
+	double eps = 0.001;//variation du cout accepté
+	double rho = 0.01;//coefficient pour mettre à jour lambda
 
 	int iteration_num = 1;
 
@@ -61,7 +61,7 @@ bool Lagrangian::solve(){
 
 
 
-		lagrange_multiplier = lagrange_multiplier + rho*(1/double(iteration_num))*(S_ijk-xij);
+		lagrange_multiplier = lagrange_multiplier + rho*(1/(1+0.1*double(iteration_num)))*(S_ijk-xij);
 
 		//cout << lagrange_multiplier << endl;
 
@@ -71,16 +71,19 @@ bool Lagrangian::solve(){
 
 		cout << "-------it : "<< iteration_num-1 << "---------" << endl;
 		cout << "pente : " << (S_ijk-xij) << endl;
-		cout << "delta : " << abs(current_cost - last_cost) << endl;
+		cout << "lagrange_multiplier : " << lagrange_multiplier << endl;
+		cout << "delta : " << abs(last_cost - current_cost) << endl;
+		cout << "Cost_x : " << pl_solver_x.get_solution().get_cost() << endl;
+		cout << "Cost_p : " << pl_solver_S.get_solution().get_cost() << endl;
 		cout << "----------------" << endl;
 		last_cost = current_cost;// Mise à jour du cout
+		cout << current_sol << endl;
 
 	}
 
 
-	cout << current_sol << endl;
 
-	this->sol = current_sol;
+
 
 
 
